@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     stages {
-        stage('Clone Repository and Navigate to Terraform Directory') {
+        stage('Building the infrastructure') {
             steps {
                 // Checkout the Git repository
                 script {
