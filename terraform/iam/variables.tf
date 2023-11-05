@@ -91,7 +91,8 @@ variable "permissions-roles-management" {
     "container.services.proxy",
     "container.services.update",
     "container.services.updateStatus",
-    "artifactregistry.repositories.uploadArtifacts"
+    "artifactregistry.repositories.uploadArtifacts",
+    "compute.instances.get"
   ]
 }
 variable "permissions-roles-gke" {
