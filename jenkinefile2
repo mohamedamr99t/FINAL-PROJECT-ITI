@@ -7,8 +7,8 @@ pipeline {
         ARTIFACT_REGISTRY_REPO = 'us-central1-docker.pkg.dev/m-amr-project-one/cluster-storage'
         DOCKER_IMAGE_NAME = 'helloworld-flask-app'
         MANAGEMENT_INSTANCE_NAME = 'vmmanagement'
-        GKE_ZONE = 'asia-east1-a'
-        SERVICE_ACCOUNT_JSON_KEY = credentials('gcp-service-account-key')
+        GKE_ZONE = 'asia-east1'
+        SERVICE_ACCOUNT_JSON_KEY = credentials('gcp-service-account-key0')
 
     }
 
