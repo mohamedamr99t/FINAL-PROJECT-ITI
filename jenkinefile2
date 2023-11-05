@@ -1,0 +1,65 @@
+pipeline {
+    agent any
+    
+    environment {
+        GCP_PROJECT = 'm-amr-project-one'
+        GKE_CLUSTER_NAME = 'my-cluster'
+        ARTIFACT_REGISTRY_REPO = 'us-central1-docker.pkg.dev/m-amr-project-one/cluster-storage'
+        DOCKER_IMAGE_NAME = 'helloworld-flask-app'
+        MANAGEMENT_INSTANCE_NAME = 'vmmanagement'
+        MANAGEMENT_ZONE = 'us-central1-b'
+        SERVICE_ACCOUNT_JSON_KEY = credentials('gcp-service-account-key')
+
+    }
+
+    stages {
+        stage('Importing the application') {
+            steps {
+                script {
+                    // Clone the repo
+                    git branch: 'main',
+                    url: 'https://github.com/mohamedamr99t/FINAL-PROJECT-ITI'
+                }
+            }
+        }
+
+         stage('Building the image into the ARTIFACT REGISTRY') {
+             steps {
+                 script {
+                    sh "gcloud auth activate-service-account --key-file=${SERVICE_ACCOUNT_JSON_KEY}"
+                    sh "gcloud config set project ${GCP_PROJECT}"
+
+                    // SSH into the GCE instance
+                    sh "gcloud compute ssh --zone ${MANAGEMENT_ZONE} ${MANAGEMENT_INSTANCE_NAME} --tunnel-through-iap"
+
+                    dir('application/'){
+                     // Build and push the Docker image to Google Artifact Registry
+                     sh " docker build -t $ARTIFACT_REGISTRY_REPO/$DOCKER_IMAGE_NAME ."
+                     sh "gcloud auth configure-docker us-central1-docker.pkg.dev"
+                     sh " docker push $ARTIFACT_REGISTRY_REPO/$DOCKER_IMAGE_NAME"
+                 }
+                 }
+             }
+         }
+
+         stage('Deploying the image into the gke cluster') {
+             steps {
+                     script {
+                    dir('application/'){
+                         sh "gcloud auth activate-service-account --key-file=${SERVICE_ACCOUNT_JSON_KEY}"
+                    sh "gcloud config set project ${GCP_PROJECT}"
+
+                    // SSH into the GCE instance
+                    sh "gcloud compute ssh --zone ${MANAGEMENT_ZONE} ${MANAGEMENT_INSTANCE_NAME} --tunnel-through-iap"
+                         // Configure kubectl to use the GKE cluster
+                        sh "gcloud container clusters get-credentials $GKE_CLUSTER_NAME --region=asia-east1 --project=$GCP_PROJECT"
+                         // Apply the Kubernetes Deployment YAML
+                         dir('application/'){
+                         sh "kubectl apply -f application_deployment.yaml"
+                        }
+                     }
+                 }
+             }
+         }
+    }
+}

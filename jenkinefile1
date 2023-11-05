@@ -1,0 +1,23 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Clone Repository and Navigate to Terraform Directory') {
+            steps {
+                // Checkout the Git repository
+                script {
+                    def repoUrl = 'https://github.com/mohamedamr99t/FINAL-PROJECT-ITI.git'
+                    def repoDir = checkout(scm: [$class: 'GitSCM', branches: [[name: '*/main']], userRemoteConfigs: [[url: repoUrl]]])
+                }
+
+                // Change to the "terraform" directory
+                dir('terraform') {
+                    // Your Terraform-related commands here
+                    sh 'terraform init'
+                    // Apply your Terraform changes
+                    sh 'terraform apply'
+                }
+            }
+        }
+    }
+}
