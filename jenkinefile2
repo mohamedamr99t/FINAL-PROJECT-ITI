@@ -7,7 +7,7 @@ pipeline {
         ARTIFACT_REGISTRY_REPO = 'us-central1-docker.pkg.dev/m-amr-project-one/cluster-storage'
         DOCKER_IMAGE_NAME = 'helloworld-flask-app'
         MANAGEMENT_INSTANCE_NAME = 'vmmanagement'
-        MANAGEMENT_ZONE = 'us-central1-b'
+        GKE_ZONE = 'asia-east1-a'
         SERVICE_ACCOUNT_JSON_KEY = credentials('gcp-service-account-key')
 
     }
@@ -30,7 +30,7 @@ pipeline {
                     sh "gcloud config set project ${GCP_PROJECT}"
 
                     // SSH into the GCE instance
-                    sh "gcloud compute ssh --zone ${MANAGEMENT_ZONE} ${MANAGEMENT_INSTANCE_NAME} --tunnel-through-iap"
+                    sh "gcloud compute ssh --zone ${GKE_ZONE} ${MANAGEMENT_INSTANCE_NAME} --tunnel-through-iap"
 
                     dir('application/'){
                      // Build and push the Docker image to Google Artifact Registry
@@ -50,7 +50,7 @@ pipeline {
                     sh "gcloud config set project ${GCP_PROJECT}"
 
                     // SSH into the GCE instance
-                    sh "gcloud compute ssh --zone ${MANAGEMENT_ZONE} ${MANAGEMENT_INSTANCE_NAME} --tunnel-through-iap"
+                    sh "gcloud compute ssh --zone ${GKE_ZONE} ${MANAGEMENT_INSTANCE_NAME} --tunnel-through-iap"
                          // Configure kubectl to use the GKE cluster
                         sh "gcloud container clusters get-credentials $GKE_CLUSTER_NAME --region=asia-east1 --project=$GCP_PROJECT"
                          // Apply the Kubernetes Deployment YAML
