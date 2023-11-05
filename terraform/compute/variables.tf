@@ -20,8 +20,5 @@ variable "service_account_email" {
 }
 variable "tag" {
   type = list(any)
-}
-variable "startup_script" {
-  type        = string
-  description = "Startup script for GCP instance"
+  
 }

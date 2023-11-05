@@ -24,8 +24,6 @@ module "compute" {
   network-subnet        = module.network.management_subnet
   service_account_email = module.iam.service_account-management-email
   tag                   = module.network.firewall
-  startup_script        = file("./startup.sh")
-
 }
 module "gke" {
   source                         = "./gke"
