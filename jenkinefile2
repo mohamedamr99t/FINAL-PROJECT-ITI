@@ -24,7 +24,7 @@ pipeline {
             }
         }
 
-         stage('Building the image into the ARTIFACT REGISTRY') {
+         stage('Building the image into artifact registry') {
              steps {
                  script {
                     sh "gcloud auth activate-service-account --key-file=${SERVICE_ACCOUNT_JSON_KEY}"
@@ -42,7 +42,7 @@ pipeline {
              }
          }
 
-         stage('Deploying the image into the gke cluster') {
+         stage('Deploying the image into the cluster') {
              steps {
                      script {
                     dir('application/'){
