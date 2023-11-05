@@ -11,13 +11,13 @@ resource "google_service_account" "gke_sa" {
 
 resource "google_project_iam_binding" "service-accounts-binding-management" {
   project = var.project_id
-  role    = google_project_iam_custom_role.management_role_x.id
+  role    = var.vm_roles[count.index]
 
   members = [google_service_account.management_sa.member]
 }
 
 resource "google_project_iam_binding" "service-accounts-binding-gke" {
   project = var.project_id
-  role    = google_project_iam_custom_role.gke_role_x.id
+  role    = var.gke_roles[count.index]
   members = [google_service_account.gke_sa.member]
 }
