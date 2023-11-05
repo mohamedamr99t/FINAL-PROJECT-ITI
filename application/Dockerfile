@@ -9,7 +9,7 @@ ADD . /myApp
 
 # Install Flask and expose the port
 RUN pip install Flask
-EXPOSE 8000
+EXPOSE 5000
 
 # Run the application
 CMD ["python", "helloworld.py"]

@@ -15,8 +15,15 @@ pipeline {
                     // Your Terraform-related commands here
                     sh 'terraform init'
                     // Apply your Terraform changes
-                    sh 'terraform apply'
+                    sh 'terraform apply -auto-approve'
                 }
+            }
+        }
+
+        stage('Trigger Application Pipeline') {
+            steps {
+                // Trigger the application pipeline by name
+                build job: 'application-pipeline'
             }
         }
     }

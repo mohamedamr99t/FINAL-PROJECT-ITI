@@ -1,11 +1,9 @@
-
 resource "google_container_cluster" "gke_cluster" {
   name               = "my-cluster"
   location           = var.network-subnet.region
   initial_node_count = 1
   network            = var.network-subnet.network
   subnetwork         = var.network-subnet.name
-
 
   addons_config {
     http_load_balancing {
@@ -25,7 +23,7 @@ resource "google_container_cluster" "gke_cluster" {
   }
   master_authorized_networks_config {
     cidr_blocks {
-      cidr_block = var.authorized_networks_cidr_range
+      cidr_block = "0.0.0.0/0"  # Allow all IP ranges
     }
   }
   private_cluster_config {

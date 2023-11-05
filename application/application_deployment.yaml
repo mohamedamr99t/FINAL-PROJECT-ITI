@@ -14,10 +14,10 @@ spec:
     spec:
       containers:
       - name: flask-app
-        image: asia-east1-docker.pkg.dev/iti-final-project-403406/my-repository/hello-world-app:latest   #artifact registry images path
+        image: us-central1-docker.pkg.dev/m-amr-project-one/cluster-storage/helloworld-flask-app   #artifact registry images path
 
         ports:
-        - containerPort: 8000  # Port on which Flask app is running
+        - containerPort: 5000  # Port on which Flask app is running
 ---
 apiVersion: v1
 kind: Service
@@ -29,5 +29,5 @@ spec:
   ports:
     - protocol: TCP
       port: 80  # Port on which the service will be exposed
-      targetPort: 8000  # Port on which Flask app is running inside the pods
+      targetPort: 5000  # Port on which Flask app is running inside the pods
   type: LoadBalancer  
