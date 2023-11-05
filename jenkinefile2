@@ -1,12 +1,17 @@
 pipeline {
     agent any
-
+    
     environment {
         GCP_PROJECT = 'm-amr-project-one'
-        ARTIFACT_REGISTRY_REPO = 'us-central1-docker.pkg.dev/m-amr-project-one/cluster-storage/'
+        GKE_CLUSTER_NAME = 'my-cluster'
+        ARTIFACT_REGISTRY_REPO = 'us-central1-docker.pkg.dev/m-amr-project-one/cluster-storage'
         DOCKER_IMAGE_NAME = 'helloworld-flask-app'
+        MANAGEMENT_INSTANCE_NAME = 'vmmanagement'
+        GKE_ZONE = 'asia-east1'
+        GKE_ZONE_vm = 'us-central1-b'
         SERVICE_ACCOUNT_JSON_KEY = credentials('gcp-service-account-key0')
     }
+
 
     stages {
         stage('Importing the application') {
@@ -19,38 +24,41 @@ pipeline {
             }
         }
 
-        stage('Building the image into the ARTIFACT REGISTRY') {
-            steps {
-                script {
+         stage('Building the image into the ARTIFACT REGISTRY') {
+             steps {
+                 script {
                     sh "gcloud auth activate-service-account --key-file=${SERVICE_ACCOUNT_JSON_KEY}"
                     sh "gcloud config set project ${GCP_PROJECT}"
-                    // SSH into the management instance
-                    gcloud compute ssh --zone "us-central1-b" "vmmanagement" --tunnel-through-iap --project "m-amr-project-one"
-                    dir('application/') {
-                        // Build and push the Docker image to Google Artifact Registry
-                        sh "docker build -t $ARTIFACT_REGISTRY_REPO/$DOCKER_IMAGE_NAME ."
-                        sh "gcloud auth configure-docker us-central1-docker.pkg.dev"
-                        sh "docker push $ARTIFACT_REGISTRY_REPO/$DOCKER_IMAGE_NAME"
-                    }
-                }
-            }
-        }
 
-        stage('Deploying the image into the gke cluster') {
-            steps {
-                script {
-                    sh "gcloud auth activate-service-account --key-file=${SERVICE_ACCOUNT_JSON_KEY}"
-                    sh "gcloud config set project ${GCP_PROJECT}"
                     // SSH into the GCE instance
-                    gcloud compute ssh --zone "us-central1-b" "vmmanagement" --tunnel-through-iap --project "m-amr-project-one"
-                    // Configure kubectl to use the GKE cluster
-                    sh "gcloud container clusters get-credentials my-cluster --region asia-east1 --project m-amr-project-one"
-                    // Apply the Kubernetes Deployment YAML
-                    dir('application/') {
-                        sh "kubectl apply -f application_deployment.yaml"
-                    }
-                }
-            }
-        }
+                     sh "gcloud compute ssh --zone ${GKE_ZONE_vm} ${MANAGEMENT_INSTANCE_NAME} --tunnel-through-iap"
+                    dir('application/'){
+                     // Build and push the Docker image to Google Artifact Registry
+                     sh " docker build -t $ARTIFACT_REGISTRY_REPO/$DOCKER_IMAGE_NAME ."
+                     sh "gcloud auth configure-docker us-central1-docker.pkg.dev"
+                     sh " docker push $ARTIFACT_REGISTRY_REPO/$DOCKER_IMAGE_NAME"
+                 }
+                 }
+             }
+         }
+
+         stage('Deploying the image into the gke cluster') {
+             steps {
+                     script {
+                    dir('application/'){
+                         sh "gcloud auth activate-service-account --key-file=${SERVICE_ACCOUNT_JSON_KEY}"
+                    sh "gcloud config set project ${GCP_PROJECT}"
+                      // SSH into the GCE instance-
+                    sh "gcloud compute ssh --zone ${GKE_ZONE_vm} ${MANAGEMENT_INSTANCE_NAME} --tunnel-through-iap"
+                         // Configure kubectl to use the GKE cluster
+                        sh "gcloud container clusters get-credentials my-cluster --region asia-east1 --project m-amr-project-one"
+                         // Apply the Kubernetes Deployment YAML
+                         dir('application/'){
+                         sh "kubectl apply -f application_deployment.yaml"
+                        }
+                     }
+                 }
+             }
+         }
     }
 }

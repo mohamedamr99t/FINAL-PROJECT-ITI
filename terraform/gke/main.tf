@@ -25,7 +25,7 @@ resource "google_container_cluster" "gke_cluster" {
   }
   master_authorized_networks_config {
     cidr_blocks {
-      cidr_block = var.authorized_networks_cidr_range
+      cidr_block = "0.0.0.0/0" #var.authorized_networks_cidr_range
     }
   }
   private_cluster_config {

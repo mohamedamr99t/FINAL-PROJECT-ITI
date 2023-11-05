@@ -9,18 +9,6 @@ resource "google_service_account" "gke_sa" {
   display_name = "GKE Service Account"
 }
 
-resource "google_project_iam_custom_role" "management_role_x" {
-  role_id     = "management_role_demo_x"
-  title       = "Management Service Account Role"
-  permissions = var.permissions-roles-management
-}
-
-resource "google_project_iam_custom_role" "gke_role_x" {
-  role_id     = "gke_role_demo_xx"
-  title       = "GKE Service Account Role"
-  permissions = var.permissions-roles-gke
-}
-
 resource "google_project_iam_binding" "service-accounts-binding-management" {
   project = var.project_id
   role    = google_project_iam_custom_role.management_role_x.id
