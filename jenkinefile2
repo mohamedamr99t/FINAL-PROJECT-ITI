@@ -53,6 +53,10 @@ pipeline {
                          // Configure kubectl to use the GKE cluster
                         sh "gcloud container clusters get-credentials my-cluster --region asia-east1 --project m-amr-project-one"
                          // Apply the Kubernetes Deployment YAML
+                        script {
+                    def repoUrl = 'https://github.com/mohamedamr99t/FINAL-PROJECT-ITI.git'
+                    def repoDir = checkout(scm: [$class: 'GitSCM', branches: [[name: '*/main']], userRemoteConfigs: [[url: repoUrl]]])
+                               }
                          dir('application/'){
                          sh "kubectl apply -f application_deployment.yaml"
                         }
